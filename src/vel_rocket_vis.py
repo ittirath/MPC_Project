@@ -409,6 +409,7 @@ class RocketVis:
 
         self._update_running = False
         self.plotter, self.scene_objects = self._create_3d_scene()
+        #self.plotter = pv.Plotter(off_screen=True)
         pyvista_widget = self.plotter.show(auto_close=False, interactive_update=True, return_viewer=True, jupyter_backend='client')
 
         Ts = (T[1]-T[0]) / self.anim_rate
