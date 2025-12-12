@@ -180,21 +180,22 @@ class MPCControl_base:
             self.us = u_target
         
         # Set initial condition
-        self.x0_param.value = x0
+        self.x0_param. value = x0 - self.xs  # IMPORTANT: deviation from equilibrium
         
         # Solve the optimization problem (PIQP is better than OSQP for small horizons)
         self.ocp.solve(solver=cp.PIQP, verbose=False)
         
         # Extract results
         if self.ocp.status == 'optimal':
-            u0 = self.u_var[:, 0].value
-            x_traj = self.x_var.value
-            u_traj = self.u_var.value
+            # The optimizer gives deviations from (xs,us), add back equilibrium (xs,us)
+            u0 = self.u_var[:, 0].value + self.us
+            x_traj = self.x_var.value + self.xs.reshape(-1, 1) 
+            u_traj = self.u_var.value + self.us.reshape(-1, 1)
         else:
-            # If solver fails, return zeros
-            u0 = np.zeros(self.nu)
-            x_traj = np.zeros((self.nx, self.N + 1))
-            u_traj = np.zeros((self.nu, self.N))
+            # If solver fails return equilibrium
+            u0 = self.us 
+            x_traj = np.tile(self.xs.reshape(-1, 1), (1, self.N + 1))
+            u_traj = np.tile(self.us.reshape(-1, 1), (1, self.N))
             print(f"Warning: MPC solver failed with status: {self.ocp.status}")
 
         # YOUR CODE HERE

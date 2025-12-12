@@ -23,11 +23,18 @@ class MPCControl_zvel(MPCControl_base):
     def _get_constraints(self) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
         """
         Define constraints for z-velocity controller.
+        Absolute thrust bounds: 40 <= Pavg <= 80
+        Equilibrium:  us ≈ 66.67 (from trim)
+
+        Constraints in deviation form:  40 - us <= (u - us) <= 80 - us
+        Which simplifies to: -26.67 <= u_dev <= 13.33
         """
+        # Get equilibrium thrust (set during __init__ from trim)
+        us_P_avg = self.us[0]  # Should be around 66.67
+        
         # u in U = { u | Mu <= m } FYI u = Pavg
-        P_hover = 66.6667
         M = np.array([[1], [-1]])
-        m = np.array([40 - P_hover, 80 - P_hover])
+        m = np.array([80 - us_P_avg, -(40 - us_P_avg)])  # [13.33, 26.67]
     
         # x in X = { x | Fx <= f } FYI x = v_z UNCONSTRAINED
         F = np.zeros((0,1)) # columns = number of states = nx
