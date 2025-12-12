@@ -22,9 +22,13 @@ class MPCVelControl:
         A, B = rocket.linearize(self.xs, self.us)
 
         self.mpc_x = MPCControl_xvel(A, B, self.xs, self.us, Ts, H)
+        print("MPC X velocity controller created.")
         self.mpc_y = MPCControl_yvel(A, B, self.xs, self.us, Ts, H)
+        print("MPC Y velocity controller created.")
         self.mpc_z = MPCControl_zvel(A, B, self.xs, self.us, Ts, H)
+        print("MPC Z velocity controller created.")
         self.mpc_roll = MPCControl_roll(A, B, self.xs, self.us, Ts, H)
+        print("MPC Roll controller created.")
 
         return self
 
